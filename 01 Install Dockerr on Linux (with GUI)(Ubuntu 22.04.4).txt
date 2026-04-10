@@ -1,0 +1,170 @@
+https://docs.docker.com/engine/install/
+https://docs.docker.com/engine/install/ubuntu/
+https://docs.docker.com/engine/install/linux-postinstall/
+
+https://docs.docker.com/desktop/install/linux-install/
+https://docs.docker.com/desktop/install/ubuntu/
+
+
+
+Docker Engine
+=============
+Using VM
+--------
+In the Processors section, enable the Virtualization engine.
+In the case of VMware Workstation, you must enable: Virtualize Intel VT-x/EPT or AMD-V/RVI
+
+
+Setup the Repository
+--------------------
+1.Update the apt package index and install packages to allow apt to use a repository over HTTPS:
+$ sudo apt-get update
+$ sudo apt-get install ca-certificates curl
+(only curl needed to be installed)
+
+2.Add Docker’s official GPG key:
+$ sudo install -m 0755 -d /etc/apt/keyrings
+$ sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+$ sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+3.Use the following command to set up the repository:
+$ echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+$ sudo apt-get update
+
+
+Install Docker Engine
+---------------------
+1.Update the apt package index, and install the latest version of Docker Engine, containerd, and Docker Compose.
+$ sudo apt-get update
+$ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+2.Verify that Docker Engine is installed correctly by running the hello-world image.
+$ sudo service docker start
+$ sudo docker run hello-world
+
+3.Configure Docker to start on boot
+$ sudo systemctl enable docker.service
+$ sudo systemctl enable containerd.service
+
+Post-installation steps
+-----------------------
+1. Create the docker group (probably it already exists, created in the installation process)
+$ sudo groupadd docker
+(the group was already created)
+2.Add your user to the docker group
+$ sudo usermod -aG docker $USER
+3.To force the activation of the changes to groups:
+$ newgrp docker
+4. Verify that you can run the hello-world image from within your account scope:
+$ docker run hello-world
+
+(There is an easier way that should work with most Linux distributions:
+Install using the convenience script (https://docs.docker.com/engine/install/ubuntu/ almost at the end of this page:
+With the option DRY_RUN=1 it will show you the steps the scrtip will run when invoked
+$ curl -fsSL https://get.docker.com -o get-docker.sh
+$ DRY_RUN=1 sudo sh ./get-docker.sh
+Or just run it:
+$ curl -fsSL https://get.docker.com -o get-docker.sh
+$ sudo sh get-docker.sh
+)
+
+Uninstalling Dockers
+--------------------
+1.Uninstall the Docker Engine, CLI, containerd, and Docker Compose packages:
+sudo apt-get purge docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras
+2.Images, containers, volumes, or custom configuration files on your host aren’t automatically removed. To delete all images, containers, and volumes:
+$ sudo rm -rf /var/lib/docker
+$ sudo rm -rf /var/lib/containerd
+
+
+Docker Dekstop for Linux
+========================
+WARNING!!!
+Docker Desktop on Linux runs a Virtual Machine (VM) which creates and uses a custom docker context, desktop-linux, on startup.
+This means images and containers deployed on the Linux Docker Engine (before installation) are not available in Docker Desktop for Linux.
+
+KVM activation for Docker Desktop for Linux
+-------------------------------------------
+1.Change to root user and execute this to enable KVM module
+# modprobe kvm
+2.Dependig on your CPU:
+# modprobe kvm_intel  # Intel processors
+OR
+# modprobe kvm_amd    # AMD processors
+3.If the above comnmad fails, you can view the diagnostics by running:
+# kvm-ok
+4.To checl if the KVM modules are enabled, run:
+# lsmod | grep kvm 
+
+Setup KVM device user permissions:
+1.To check ownership of /dev/kvm, run :
+# ls -al /dev/kvm
+2.Add your user to the kvm group in order to access the kvm device
+# usermod -aG kvm $USER
+
+
+Installing Docker Dekstop for Linux
+----------------------------
+0.For non-Gnome Desktop environments, gnome-terminal must be installed:
+$ sudo apt install gnome-terminal
+
+1.Download latest DEB package.
+Example:
+https://desktop.docker.com/linux/main/amd64/139021/docker-desktop-4.28.0-amd64.deb?utm_source=docker&utm_medium=webreferral&utm_campaign=docs-driven-download-linux-amd64&_gl=1*1w5d625*_ga*MzEyODU0MTAzLjE3MTA1ODkyNzU.*_ga_XJWPQMJYHQ*MTcxMDU5MzI3Mi4yLjEuMTcxMDU5NDEzOC41OC4wLjA.
+
+
+2.Install the package with apt
+$ sudo apt-get update
+$ sudo apt-get install ./docker-desktop-<version>-<arch>.deb
+(example: $ sudo apt-get install ./docker-desktop-4.28.0-amd64.deb
+(It is expected to get an error like:
+N: Download is performed unsandboxed as root as file '/home/avillarroel/Downloads/docker-desktop-4.28.0-amd64.deb' couldn't be accessed by user '_apt'. - pkgAcquire::Run (13: Permission denied)
+this is related to having installed a downloaded file from the Internet)
+
+Running Docket Desktop for Linux
+---------------------------------
+1.To start Docker Desktop for Linux, search Docker Desktop on the Applications menu and open it. This launches the Docker menu icon and opens the Docker Dashboard, reporting the status of Docker Desktop.
+OR
+$  systemctl --user start docker-desktop
+
+2.To enable Docker Desktop to start on sign in, from the Docker menu, select Settings > General > Start Docker Desktop when you sign in to your computer.
+OR
+$ systemctl --user enable docker-desktop
+
+3.To stop Docker Desktop, select the Docker menu icon to open the Docker menu and select Quit Docker Desktop.
+OR
+$ systemctl --user stop docker-desktop
+
+IF WHEN OPENING DOCKER DESKTOP AND TRYING TO SIGN IN YOU GET AN ERROR
+---------------------------------------------------------------------
+IF WHEN OPENING DOCKER DESKTOP AND TRYING TO SIGN IN YOU GET AN ERROR Credential store not initialized,
+follow these steps:
+1.Install pass
+$ sudo apt-get install pass
+(probably you already has this installed)
+
+2.Generete a gpg key
+$ gpg --generate-key
+Real name: Alejandro Villarroel
+Email address: anvillarroel@gmail.com
+O  (Okay)
+Passprhase: alexvn123
+
+You will get an output simlar to this:
+pub   rsa3072 2022-10-18 [SC] [expires: 2024-10-17]
+      638E288CDC67040ED293A97FD6E756497F5E6F9A
+uid                      Alejandro Villarroel <anvillarroel@gmail.com>
+sub   rsa3072 2022-10-18 [E] [expires: 2024-10-17]
+
+TAKE NOTE on the ID above UID: 638E288CDC67040ED293A97FD6E756497F5E6F9A
+
+3.To initialize pass, run:
+$ pass init 638E288CDC67040ED293A97FD6E756497F5E6F9A
+
+(https://github.com/docker/docker-credential-helpers/issues/102)
+https://github.com/docker/docker-credential-helpers/releases/download/v0.7.0/docker-credential-pass-v0.7.0.linux-amd64
+
+4.Sigin in Docker Desktop

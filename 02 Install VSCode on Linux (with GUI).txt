@@ -1,0 +1,15 @@
+Installing Visual Studio Code for Linux
+--------------------------------------
+1.Use Browser like Firefox
+2.Download latest DEB package from https://code.visualstudio.com/download#
+Example: code_1.72.1-1665423861_amd64.deb
+
+1.Install the package with apt
+a.Open a terminal an use the following commands
+$ sudo apt-get update
+$ sudo apt-get install ./code_<version>_amd64.deb
+(example: $ sudo apt-get install ./code_1.72.1-1665423861_amd64.deb
+
+(It is expected to get an error like:
+N: Download is performed unsandboxed as root as file '/home/avillarroel/Downloads/code_1.72.1-1665423861_amd64.deb' couldn't be accessed by user '_apt'. - pkgAcquire::Run (13: Permission denied)
+this is related to having installed a downloaded file from the Internet)
